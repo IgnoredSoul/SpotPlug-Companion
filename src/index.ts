@@ -18,7 +18,7 @@ let isQuitting = false;
 let isRunning = false;
 let startupError: string | null = null;
 const trayIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
-const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
+const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion.ico');
 
 if (require('electron-squirrel-startup')) { app.quit(); }
 
