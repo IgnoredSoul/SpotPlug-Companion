@@ -1,0 +1,260 @@
+<!-- 
+this is ass, it's just a demo piece
+please don't use this ;-;
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Icon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --widget-height: 150px;
+            --image-size: 150px;
+            --plate-height: 150px;
+            --max-widget-width: 1000px;
+            --min-widget-width: 500px;
+            --marquee-time: 5s;
+        }
+
+        body {
+            font-family: "Josefin Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 100;
+            font-style: normal;
+        }
+
+        .widget-container {
+            height: var(--widget-height);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        #track-art {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: var(--image-size);
+            height: var(--image-size);
+            background-color: #ff0000;
+            border-radius: 8px;
+            transition: transform 0.5s ease-in-out;
+            z-index: 3;
+        }
+
+        .info-plate {
+            position: relative;
+            min-width: var(--min-widget-width);
+            max-width: var(--max-widget-width);
+            width: fit-content;
+            height: var(--plate-height);
+            margin-left: 20px;
+            padding-left: 140px;
+            padding-right: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            z-index: 1;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+        }
+
+        .info-plate::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            
+            background-image: inherit;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.2);
+            
+            z-index: -2;
+        }
+
+        .info-plate::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+
+            backdrop-filter: blur(15px) brightness(0.6); 
+            -webkit-backdrop-filter: blur(15px) brightness(0.6);
+            background-color: rgba(0, 0, 0, 0.2); 
+            
+            z-index: -1;
+        }
+
+        .plate-hidden {
+            transform: translateX(-160px);
+            opacity: 0;
+        }
+
+        .art-hidden {
+            transform: scale(0);
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .marquee-content {
+            display: inline-block;
+        }
+
+        .should-scroll {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee var(--marquee-time) linear infinite;
+            padding-right: 80px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } 
+        }
+
+        #track-title {
+            color: #fff;
+            font-size: 32px;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #track-artist {
+            color: #e6e0e0;
+            font-size: 20px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="widget-container">
+    <!-- The Yellow Plate -->
+    <div id="track-plate" class="info-plate plate-hidden">
+        <div class="text-content">
+        <h1 id="track-title" class="">TITLE</h1>
+        <p id="track-artist">ARTIST</p>
+        </div>
+    </div>
+    <!-- The Red Square (Art) -->
+    <img id="track-art" class="art-hidden" src="https://via.placeholder.com/150/FF0000/FFFFFF?text=ART">
+    </div>
+
+    <!-- Import socket.io via cdn url -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+
+        // Change the "8000" to your desired port
+        const socket = io("http://localhost:8000");
+        const trackArtEL = document.getElementById('track-art');
+        const trackPlateEl = document.getElementById('track-plate')
+        const titleEl = document.getElementById('track-title');
+        const artistsEl = document.getElementById('track-artist');
+
+        let isHidden = true;
+
+        // Tell the server we connected
+        socket.emit('connected');
+        
+        // When spicetify connects
+        socket.on("spicetify-connected", (data) => {
+            console.log("[Connected]", data);
+            UpdateInfo(data.title, data.artists, data.artUrl);
+        })
+
+        // When spicetify changes song
+        socket.on("spicetify-songchange", (data) => {
+            console.log("[SongChange]", data)
+            UpdateInfo(data.title, data.artists, data.artUrl);
+        });
+        
+        // When spicetify resumes/pauses the song
+        socket.on("spicetify-playpause", async (isPaused) => {
+            console.log("[Play Pause]", isPaused);
+            if(isPaused) {   
+                trackPlateEl.classList.add('plate-hidden');
+                await delay(200);
+                trackArtEL.classList.add('art-hidden');
+                isHidden = true;
+            } else {
+                trackArtEL.classList.remove('art-hidden');
+                await delay(300);
+                trackPlateEl.classList.remove('plate-hidden');
+                isHidden = false;
+            }
+        });
+
+        // Progress of the current song
+        socket.on("spicetify-progress", (data) => {
+            console.log("[Progress]", data);
+        });
+
+        // When spicetify disconnects
+        socket.on("spicetify-disconnected", () => {
+            console.log("[Disconnect]");
+        });
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function UpdateInfo(title, artists, image) {
+
+            // Start the hide animations
+            if(!isHidden) {
+                
+                isHidden = true;
+
+                trackPlateEl.classList.add('plate-hidden');
+                await delay(200);
+                trackArtEL.classList.add('art-hidden');
+
+                // Wait for animations
+                await delay(500);
+            }
+
+            // Update the content
+            trackArtEL.src = image;
+            trackPlateEl.style.backgroundImage = `url('${image}')`;
+            titleEl.innerText = title;
+            artistsEl.innerText = artists;
+            
+            // Recalculate marquee now that text has changed
+            handleMarquee(titleEl);
+            handleMarquee(artistsEl);
+
+            // Reveal
+            trackArtEL.classList.remove('art-hidden');
+            await delay(300);
+            trackPlateEl.classList.remove('plate-hidden');
+            isHidden = false;
+
+            function handleMarquee(element) {
+                const container = element.parentElement;
+                
+                // Reset state
+                element.classList.remove('should-scroll');
+                element.innerHTML = element.innerText; 
+    
+                // Is the text wider than the available space in the plate
+                if (element.scrollWidth > container.offsetWidth) {
+                    element.innerHTML = `${element.innerText} &nbsp;&nbsp;&nbsp; ${element.innerText}`;
+                    element.classList.add('should-scroll');
+                }
+            }
+        }
+
+
+    </script>
+</body>
+</html>

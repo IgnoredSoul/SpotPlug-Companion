@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging data</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; }
+        
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #27ae60;
+            border: none;
+            color: white;
+            border-radius: 4px;
+        }
+
+        .content-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            flex-grow: 1;
+            overflow: hidden;
+            background: #ecf0f1;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #bdc3c7;
+            background: white;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px;
+            scroll-behavior: smooth; /* Makes the jump look nice */
+        }
+
+        .column:last-child { border-right: none; }
+
+        .col-header {
+            position: sticky;
+            top: 0;
+            background: #34495e;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            z-index: 10; /* Keeps it above the scrolling JSON */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .item {
+            inline-size: 90%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            background: #f1f1f1;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            animation: fadeIn 0.3s ease;
+        }
+
+        pre {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0;
+            white-space: pre-wrap;       /* This fixes your overflow issue! */
+            word-wrap: break-word;       /* Extra insurance for long strings */
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <main class="content-area">
+            <div class="column" id="col-connection"><div class="col-header">Connection</div></div>
+            <div class="column" id="col-songchange"><div class="col-header">Song Change</div></div>
+            <div class="column" id="col-playpause"><div class="col-header">Play/Pause</div></div>
+            <div class="column" id="col-progress"><div class="col-header">Progress</div></div>
+        </main>
+    </div>
+
+    <!-- Import socket.io via cdn url -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+
+        // Change the "8000" to your desired port
+        const socket = io("http://localhost:8000");
+        const container = document.getElementById('grid-container');
+
+        // Tell the server we connected
+        socket.emit('connected');
+        
+        // When spicetify connects
+        socket.on("spicetify-connected", (data) => {
+            console.log("[Connected]", data);
+            addContent('connection', "Connected")
+        })
+
+        // When spicetify changes song
+        socket.on("spicetify-songchange", (data) => {
+            console.log("[SongChange]", data)
+            addContent('songchange', JSON.stringify(data, null, 2))
+        });
+        
+        // When spicetify resumes/pauses the song
+        socket.on("spicetify-playpause", (isPaused) => {
+            console.log("[Play Pause]", isPaused);
+            addContent('playpause', JSON.stringify(isPaused, null, 2))
+        });
+
+        // Progress of the current song
+        socket.on("spicetify-progress", (data) => {
+            console.log("[Progress]", data);
+            addContent('progress', JSON.stringify(data, null, 2))
+        });
+
+        // When spicetify disconnects
+        socket.on("spicetify-disconnected", () => {
+            console.log("[Disconnect]");
+            addContent('connection', "Disconnected")
+        });
+
+        function addContent(column_name, content) {
+            // Get column
+            const column = document.getElementById(`col-${column_name}`);
+
+            // Create new content element
+            const newItem = document.createElement('pre');
+            newItem.className = 'item';
+            newItem.innerHTML = content;
+
+            // Append the content
+            column.appendChild(newItem);
+
+            // AUTO-SCROLL LOGIC: 
+            // Set the scroll position to the very bottom of the container
+            column.scrollTop = column.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
