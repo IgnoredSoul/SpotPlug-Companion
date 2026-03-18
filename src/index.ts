@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu, ipcMain, Tray, nativeImage } from 'electron';
 import { startBackend, stopBackend } from './socket-server';
 import Store from 'electron-store';
 import * as path from 'path';
+const fs = require('fs');
 
 const store = new (Store as any)({
   defaults: {
@@ -14,10 +15,10 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 let mainWindow: BrowserWindow | null;
 let tray: Tray | null = null;
 let isQuitting = false;
-let isRunning: boolean = false;
+let isRunning = false;
 let startupError: string | null = null;
-const trayIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src', 'icons'), 'SpotPlugCompanion_Tray.ico');
-const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src', 'icons'), 'SpotPlugCompanion.ico');
+const trayIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
+const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
 
 if (require('electron-squirrel-startup')) { app.quit(); }
 
@@ -58,8 +59,6 @@ const createWindow = (): void => {
 		const savedPort = store.get('serverPort') || 8000;
 		currentWindow.webContents.send('init-settings', { port: savedPort });
 	});
-
-	// mainWindow.webContents.openDevTools();
 };
 
 const createTray = () => {
@@ -80,7 +79,7 @@ const createTray = () => {
     }
   ]);
 
-  tray.setToolTip('My Awesome App');
+  tray.setToolTip('SpotPlug Companion');
   tray.setContextMenu(contextMenu);
 
   // Optional: Show window when clicking the tray icon
@@ -123,7 +122,6 @@ app.on('window-all-closed', () => {
 	}
 });
 
-// Why?
 app.on('activate', () => {
 	if (BrowserWindow.getAllWindows().length === 0) {
 		createWindow();

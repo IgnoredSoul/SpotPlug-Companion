@@ -12,6 +12,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onStatusUpdate: (callback: any) => ipcRenderer.on('status-update', (_event, state) => callback(state)),
     onSongChange: (callback: any) => ipcRenderer.on('status-songchange', (_event, data) => callback(data)),
     onPlayPause: (callback: any) => ipcRenderer.on('status-playpause', (_event, state) => callback(state)),
-    onProgress: (callback: any) => ipcRenderer.on('status-progress', (_event, state) => callback(state),)
+    onProgress: (callback: any) => ipcRenderer.on('status-progress', (_event, state) => callback(state))
 
 });

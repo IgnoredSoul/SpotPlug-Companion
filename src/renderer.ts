@@ -104,10 +104,6 @@ updateConnectionText(portInput.value || 8000);
 // Update the start/stop server button
 function updateServerUI(isRunning: boolean) {
 
-  // Get this shit
-  const serverBtn = document.querySelector('.server-state') as HTMLButtonElement;
-  const portInput = document.querySelector('.server-port') as HTMLInputElement;
-
   if (isRunning) {
     serverBtn.innerText = "Stop Server";
     serverBtn.style.backgroundColor = "#ff453a"; // Red

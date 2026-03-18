@@ -30,7 +30,7 @@ export function stopBackend(): Promise<void> {
 }
 
 // Start the servers and shit
-export function startBackend(onDataReceived: (event: string, data: any) => void, port: number = 8000): Promise<void> {
+export function startBackend(onDataReceived: (event: string, data: any) => void, port = 8000): Promise<void> {
   return new Promise((resolve, reject) => {
     httpServer = http.createServer();
     ioServer = new SocketIOServer(httpServer, { cors: { origin: "*" }, serveClient: false });

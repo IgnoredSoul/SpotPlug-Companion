@@ -14,7 +14,10 @@ import { rendererConfig } from './webpack.renderer.config';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    icon: './src/icons/SpotPlugCompanion.ico'
+    icon: './src/icons/SpotPlugCompanion.ico',
+    extraResource: [
+      './src/icons'
+    ]
   },
   rebuildConfig: {},
   makers: [
