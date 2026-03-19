@@ -2,7 +2,6 @@ import { app, BrowserWindow, Menu, ipcMain, Tray, nativeImage } from 'electron';
 import { startBackend, stopBackend } from './socket-server';
 import Store from 'electron-store';
 import * as path from 'path';
-const fs = require('fs');
 
 const store = new (Store as any)({
   defaults: {
