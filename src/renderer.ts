@@ -40,7 +40,7 @@ window.electronAPI.onStatusUpdate((connected) => {
 
 // When the progress has changed
 window.electronAPI.onProgress((data: any) => {
-  progressBar.style.width = data.progress_p + '%';
+  progressBar.style.width = data.percentage + '%';
 })
 
 // When spicetify changes song

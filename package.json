@@ -17,7 +17,9 @@
       {
         "from": "src/icons",
         "to": "icons",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ]
   },

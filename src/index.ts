@@ -26,7 +26,7 @@ const createWindow = (): void => {
   // Remove the alt menu stuff
 	Menu.setApplicationMenu(null);
 	mainWindow = new BrowserWindow({
-		height: 600,
+		height: 620,
 		width: 700, 
 		frame: false,
     icon: appIco,
@@ -140,6 +140,7 @@ ipcMain.on('window-close', () => {
 });
 
 // Toggle the Socket && Http server shit
+// For some reason you gotta press 'stop server' a few times. Wild.
 ipcMain.handle('toggle-server', async () => {
 
   // Runnin

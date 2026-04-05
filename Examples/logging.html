@@ -33,7 +33,7 @@
 
         .content-area {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5,1fr);
             flex-grow: 1;
             overflow: hidden;
             background: #ecf0f1;
@@ -47,7 +47,7 @@
             overflow-x: auto;
             overflow-y: hidden;
             padding: 10px;
-            scroll-behavior: smooth; /* Makes the jump look nice */
+            scroll-behavior: smooth;
         }
 
         .column:last-child { border-right: none; }
@@ -59,7 +59,7 @@
             color: white;
             padding: 8px 12px;
             font-weight: bold;
-            z-index: 10; /* Keeps it above the scrolling JSON */
+            z-index: 10;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             text-transform: uppercase;
             font-size: 0.8rem;
@@ -82,8 +82,8 @@
             padding: 10px;
             border-radius: 4px;
             margin: 0;
-            white-space: pre-wrap;       /* This fixes your overflow issue! */
-            word-wrap: break-word;       /* Extra insurance for long strings */
+            white-space: pre-wrap;
+            word-wrap: break-word;
             font-family: monospace;
             font-size: 12px;
         }
@@ -101,6 +101,7 @@
             <div class="column" id="col-songchange"><div class="col-header">Song Change</div></div>
             <div class="column" id="col-playpause"><div class="col-header">Play/Pause</div></div>
             <div class="column" id="col-progress"><div class="col-header">Progress</div></div>
+            <div class="column" id="col-other"><div class="col-header">Other</div></div>
         </main>
     </div>
 
@@ -112,40 +113,49 @@
         const socket = io("http://localhost:8000");
         const container = document.getElementById('grid-container');
 
-        // Tell the server we connected
-        socket.emit('connected');
-        
-        // When spicetify connects
-        socket.on("spicetify-connected", (data) => {
-            console.log("[Connected]", data);
-            addContent('connection', "Connected")
+        socket.on("connect", (data) => {
+            console.log("[Sever Connected]");
+            addContent('connection', "Connected to server")
         })
 
         // When spicetify changes song
-        socket.on("spicetify-songchange", (data) => {
+        socket.on("spotify-songchange", (data) => {
             console.log("[SongChange]", data)
             addContent('songchange', JSON.stringify(data, null, 2))
         });
         
         // When spicetify resumes/pauses the song
-        socket.on("spicetify-playpause", (isPaused) => {
+        socket.on("spotify-playpause", (isPaused) => {
             console.log("[Play Pause]", isPaused);
             addContent('playpause', JSON.stringify(isPaused, null, 2))
         });
 
         // Progress of the current song
-        socket.on("spicetify-progress", (data) => {
+        socket.on("spotify-progress", (data) => {
             console.log("[Progress]", data);
             addContent('progress', JSON.stringify(data, null, 2))
         });
 
         // When spicetify disconnects
-        socket.on("spicetify-disconnected", () => {
+        socket.on("spotify-disconnected", () => {
             console.log("[Disconnect]");
             addContent('connection', "Disconnected")
         });
 
+        // Get the current artists' profile
+        socket.emit('current_artist', (data) => {
+            console.log('current_artist', data)
+            // addContent('other', JSON.stringify(data, null, 2))
+        });
+
+        // Get the current track manually
+        socket.emit('current_track', (data) => {
+            console.log('current_track', data)
+            addContent('other', JSON.stringify(data, null, 2))
+        });
+
         function addContent(column_name, content) {
+
             // Get column
             const column = document.getElementById(`col-${column_name}`);
 
@@ -157,8 +167,6 @@
             // Append the content
             column.appendChild(newItem);
 
-            // AUTO-SCROLL LOGIC: 
-            // Set the scroll position to the very bottom of the container
             column.scrollTop = column.scrollHeight;
         }
 

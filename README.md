@@ -5,54 +5,8 @@ From there, your own socket client can connect and receive events from the serve
 
 # Communication
 
-### `spicetify-connected`
-#### notifies your client that SpotPlug has connected
-
-| key | desc | type |
-| :--- | :--- | :--- |
-| `title` | Title of the song | `string` |
-| `album` | Title of the album | `string` |
-| `artUrl` | Spotify URL to the cover art | `string` |
-| `durationMs` | How long the song is in milliseconds | `int` |
-| `isPaused` | Current playback state of the song | `bool` |
-
----
-
-### `spicetify-disconnected`
-#### notifies your client that spicetify has disconnected
-
----
-
-### `spicetify-songchange`
-#### notifies your client that SpotPlug has changed songs
-
-
-| key | desc | type |
-| :--- | :--- | :--- |
-| `title` | Title of the song | `string` |
-| `album` | Title of the album | `string` |
-| `artUrl` | Spotify URL to the cover art | `string` |
-| `durationMs` | How long the song is in milliseconds | `int` |
-| `isPaused` | Current playback state of the song | `bool` |
-
----
-
-### `spicetify-progress`
-#### notifies your client about the current playback time
-
-| key | desc | type |
-| :--- | :--- | :--- |
-| `milliseconds` | The playback time in milliseconds | `int` |
-| `percentage` | The playback time as a percentage | `float` |
-
----
-
-### `spicetify-playpause`
-#### notifies your client that SpotPlug has paused/resumed the current song
-
-| key | desc | type |
-| :--- | :--- | :--- |
-| `isPaused` | Current playback state of the song | `bool` |
+Just use the [logging.html](/logging.html) and read [SpotPlug](https://github.com/IgnoredSoul/SpotPlug)'s docs to understand.  
+Honestly cannot be arsed to write it all.
 
 
 
