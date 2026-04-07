@@ -51,13 +51,13 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       // console.log(`[SERVER]: A new socket connected`)
 
       // When spotify connects
-      socket.on('p2s_connect', (data) => {
+      socket.on('p2s-connect', (data) => {
         
         // Track socket
         spotifySocketId = socket.id;
 
         // Emit to spotify socket for data
-        ioServer.to(spotifySocketId).timeout(2500).emit('s2p-current_track', (err: any, responseData: any) => {
+        ioServer.to(spotifySocketId).timeout(2500).emit('s2p-current-track', (err: any, responseData: any) => {
           const data = responseData[0]; 
           onDataReceived('status-songchange', data);
           onDataReceived('status-playpause', data.isPaused);
@@ -69,7 +69,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       });
       
       // When the song changes
-      socket.on('p2s_songchange', (data: any) => {
+      socket.on('p2s-songchange', (data: any) => {
         
         // Update UI
         onDataReceived('status-update', true);
@@ -81,7 +81,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       });
       
       // When the playback pauses or resumes
-      socket.on('p2s_playpause', (data) => {
+      socket.on('p2s-playpause', (data) => {
         
         // Update UI
         onDataReceived('status-update', true);
@@ -92,7 +92,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       });
       
       // When the tracks' progress has changed
-      socket.on('p2s_progress', (data) => {
+      socket.on('p2s-progress', (data) => {
         
         // Update UI
         onDataReceived('status-update', true);
@@ -103,11 +103,11 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       });
       
       // When a client requests the current track
-      socket.on('spotify-current_track', async (callback) => {
+      socket.on('spotify-current-track', async (callback) => {
         if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
 
         try {
-          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current_track');
+          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current-track');
           callback(response.length > 0 ? response[0] : {error: 'no data in response?'});
 
         } catch (e) {
@@ -117,11 +117,11 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       });
       
       // When a client requests the current artist
-      socket.on('spotify-current_artist', async (callback) => {
+      socket.on('spotify-current-artist', async (callback) => {
         if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
 
         try {
-          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current_artist');
+          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current-artist');
           callback(response.length > 0 ? response[0] : {error: 'no data in response?'});
 
         } catch (e) {
