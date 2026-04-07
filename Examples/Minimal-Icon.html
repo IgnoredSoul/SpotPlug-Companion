@@ -164,24 +164,19 @@ please don't use this ;-;
         const artistsEl = document.getElementById('track-artist');
 
         let isHidden = true;
-
-        // Tell the server we connected
-        socket.emit('connected');
         
-        // When spicetify connects
-        socket.on("spicetify-connected", (data) => {
-            console.log("[Connected]", data);
-            UpdateInfo(data.title, data.artists, data.artUrl);
-        })
+        socket.on("connect", console.log("[Sever Connected]"))
 
-        // When spicetify changes song
-        socket.on("spicetify-songchange", (data) => {
-            console.log("[SongChange]", data)
-            UpdateInfo(data.title, data.artists, data.artUrl);
+        socket.emit('current_track', (response) => {
+            if (response.error) console.error("Oops:", response.error);
+            else UpdateInfo(response.title, response.artists, response.art);
         });
+
+        // When spotify connects
+        socket.on("spotify-connected", (data) => UpdateInfo(data.title, data.artists, data.artUrl))
         
-        // When spicetify resumes/pauses the song
-        socket.on("spicetify-playpause", async (isPaused) => {
+        // When spotify resumes/pauses the song
+        socket.on("spotify-playpause", async (isPaused) => {
             console.log("[Play Pause]", isPaused);
             if(isPaused) {   
                 trackPlateEl.classList.add('plate-hidden');
@@ -194,16 +189,6 @@ please don't use this ;-;
                 trackPlateEl.classList.remove('plate-hidden');
                 isHidden = false;
             }
-        });
-
-        // Progress of the current song
-        socket.on("spicetify-progress", (data) => {
-            console.log("[Progress]", data);
-        });
-
-        // When spicetify disconnects
-        socket.on("spicetify-disconnected", () => {
-            console.log("[Disconnect]");
         });
 
         const delay = ms => new Promise(res => setTimeout(res, ms));
