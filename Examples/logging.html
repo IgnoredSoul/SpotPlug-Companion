@@ -143,13 +143,13 @@
         });
 
         // Get the current artists' profile
-        socket.emit('current_artist', (data) => {
+        socket.emit('s2p-current-artist', (data) => {
             console.log('current_artist', data)
             // addContent('other', JSON.stringify(data, null, 2))
         });
 
         // Get the current track manually
-        socket.emit('current_track', (data) => {
+        socket.emit('s2p-current-track', (data) => {
             console.log('current_track', data)
             addContent('other', JSON.stringify(data, null, 2))
         });
