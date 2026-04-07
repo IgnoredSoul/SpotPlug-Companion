@@ -102,6 +102,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
         ioServer.emit('spotify-progress', data)
       });
       
+      // When a client requests the current track
       socket.on('spotify-current_track', async (callback) => {
         if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
 
@@ -115,6 +116,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
         }
       });
       
+      // When a client requests the current artist
       socket.on('spotify-current_artist', async (callback) => {
         if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
 
