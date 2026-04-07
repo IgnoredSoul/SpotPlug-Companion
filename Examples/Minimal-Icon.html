@@ -167,7 +167,7 @@ please don't use this ;-;
         
         socket.on("connect", console.log("[Sever Connected]"))
 
-        socket.emit('current_track', (response) => {
+        socket.emit('s2p-current-track', (response) => {
             if (response.error) console.error("Oops:", response.error);
             else UpdateInfo(response.title, response.artists, response.art);
         });
