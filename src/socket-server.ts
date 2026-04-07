@@ -57,7 +57,7 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
         spotifySocketId = socket.id;
 
         // Emit to spotify socket for data
-        ioServer.to(spotifySocketId).timeout(2500).emit('current_track', (err: any, responseData: any) => {
+        ioServer.to(spotifySocketId).timeout(2500).emit('s2p-current_track', (err: any, responseData: any) => {
           const data = responseData[0]; 
           onDataReceived('status-songchange', data);
           onDataReceived('status-playpause', data.isPaused);
@@ -102,8 +102,34 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
         ioServer.emit('spotify-progress', data)
       });
       
+      socket.on('spotify-current_track', async (callback) => {
+        if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
+
+        try {
+          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current_track');
+          callback(response.length > 0 ? response[0] : {error: 'no data in response?'});
+
+        } catch (e) {
+          console.error("Failed to fetch from Spotify client:", e);
+          callback({ error: "Spotify client timed out or failed." });
+        }
+      });
+      
+      socket.on('spotify-current_artist', async (callback) => {
+        if (!spotifySocketId) return callback({ error: "Spotify client is not connected." });
+
+        try {
+          const response = await ioServer.to(spotifySocketId).timeout(2000).emitWithAck('s2p-current_artist');
+          callback(response.length > 0 ? response[0] : {error: 'no data in response?'});
+
+        } catch (e) {
+          console.error("Failed to fetch from Spotify client:", e);
+          callback({ error: "Spotify client timed out or failed." });
+        }
+      });
+
       // When a client disconnects
-      socket.on('disconnect', (data) => {
+      socket.on('disconnect', () => {
         
         // If the socket that disconnected was the spotify socket
         if(spotifySocketId === socket.id) {
