@@ -1,7 +1,7 @@
 {
   "name": "spotplug-companion",
   "productName": "spotplug-companion",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "SpotPlug Companion",
   "main": ".webpack/main",
   "private": true,
