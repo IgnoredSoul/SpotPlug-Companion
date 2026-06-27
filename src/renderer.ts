@@ -27,12 +27,16 @@ document.getElementById('close-btn')?.addEventListener('click', window.electronA
 // When spicetify connects/disconnects
 window.electronAPI.onStatusUpdate((connected) => {
   if (connected) {
-    dot.style.background = '#1db954';
-    dot.style.boxShadow = '0 0 8px #1db954';
+    if(dot) {
+      dot.style.background = '#1db954';
+      dot.style.boxShadow = '0 0 8px #1db954';
+    }
     if (statusText) statusText.innerText = 'Connected';
   } else {
-    dot.style.background = '#ff453a';
-    dot.style.boxShadow = '0 0 5px #ff453a';
+    if(dot) {
+      dot.style.background = '#ff453a';
+      dot.style.boxShadow = '0 0 5px #ff453a';
+    }
     if (statusText) statusText.innerText = 'Disconnected';
     if (trackInfo) trackInfo.innerText = 'Waiting for data...';
   }
@@ -40,14 +44,12 @@ window.electronAPI.onStatusUpdate((connected) => {
 
 // When the progress has changed
 window.electronAPI.onProgress((data: any) => {
-  progressBar.style.width = data.percentage + '%';
+  if(progressBar && data) progressBar.style.width = data.percentage + '%';
 })
 
 // When spicetify changes song
 window.electronAPI.onSongChange((data: any) => {
-  if (trackInfo) {
-    trackInfo.innerText = `${data.title} — ${data.artists}`;
-  }
+  if (trackInfo && data) trackInfo.innerText = `${data[0].title} — ${data[0].artists}`;
 });
 
 // When spicetify pause/resume

@@ -57,11 +57,11 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
         spotifySocketId = socket.id;
 
         // Emit to spotify socket for data
-        // ioServer.to(spotifySocketId).timeout(2500).emit('s2p-current-track', (err: any, responseData: any) => {
-        //   onDataReceived('status-songchange', data);
-        //   onDataReceived('status-playpause', data.isPaused);
-        //   onDataReceived('status-update', true);
-        // });
+        ioServer.to(spotifySocketId).timeout(2500).emit('s2p-current-track', (err: any, responseData: any) => {
+          onDataReceived('status-songchange', responseData);
+          onDataReceived('status-playpause', responseData.isPaused);
+          onDataReceived('status-update', true);
+        });
         
         // Emit to everyone else that spotify has connected
         ioServer.emit('spotify-connect'); 
@@ -83,11 +83,10 @@ export function startBackend(onDataReceived: (event: string, data: any) => void,
       socket.on('p2s-playpause', (data) => {
         
         // Update UI
-        onDataReceived('status-update', true);
-        // onDataReceived('status-playpause', data.isPaused);
+        onDataReceived('status-playpause', data.isPaused);
         
         // Emit to everyone that spotify has either pauses or resumed
-        // ioServer.emit('spotify-playpause', data.isPaused)
+        ioServer.emit('spotify-playpause', data.isPaused)
       });
       
       // When the tracks' progress has changed

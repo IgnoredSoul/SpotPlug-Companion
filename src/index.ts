@@ -3,21 +3,16 @@ import { startBackend, stopBackend } from './socket-server';
 import Store from 'electron-store';
 import * as path from 'path';
 
-const store = new (Store as any)({
-  defaults: {
-    serverPort: 8000
-  }
-});
-
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+const trayIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
+const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion.ico');
+const store = new (Store as any)({ defaults: { serverPort: 8000 } });
 let mainWindow: BrowserWindow | null;
 let tray: Tray | null = null;
 let isQuitting = false;
 let isRunning = false;
 let startupError: string | null = null;
-const trayIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion_Tray.ico');
-const appIco = path.join(app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..', 'src'), 'icons', 'SpotPlugCompanion.ico');
 
 if (require('electron-squirrel-startup')) { app.quit(); }
 
